@@ -1,0 +1,37 @@
+# netflix-fe k8s yaml for deployment
+# 1. netflix-fe k8s yaml for deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: netflixfe-deployment
+  labels:
+    app: netflixfe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: netflixfe
+  template:
+    metadata:
+      labels:
+        app: netflixfe
+    spec:
+      containers:
+        - name: netflix-frontend
+          image: barrotem/netflix-frontend-dev:v1.0.6
+          env:
+            - name: MOVIE_CATALOG_SERVICE
+              value: "http://netflix-mc-service:8080"
+            - name: REDIS_URL
+              value: "redis-master:6379"
+          # Apply liveness and readiness probes on port 3000
+          livenessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/"
+              port: 3000
+          readinessProbe:
+            initialDelaySeconds: 10
+            httpGet:
+              path: "/"
+              port: 3000
